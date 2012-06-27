@@ -17,9 +17,9 @@ Basic idea:
 
 ### How to use all this files?
 Make sure you install Arduino IDE and Xcode. And connect Arduino, WiFi Shield, Joystick Shield together.
-1. Copy&Paste WiShield Folder under your Arduino libraries folder
-2. Using Arduino IDE to open the file in /UDPButtonControlOK/ folder, 
+- Copy&Paste WiShield Folder under your Arduino libraries folder
+- Using Arduino IDE to open the file in /UDPButtonControlOK/ folder, 
 change the ip to your iPhone's ip in "uip_ipaddr(&addr, 192, 168, 1, 112);"
 compile and upload it to your Arduino.
-3. In Xcode, open SpaceGame.xcodeproj under /iPhone/SpaceGame/ folder, compile and run it on your iPhone.
-4. Start firing when you press A button on Joystick Shield.
+- In Xcode, open SpaceGame.xcodeproj under /iPhone/SpaceGame/ folder, compile and run it on your iPhone.
+- Start firing when you press A button on Joystick Shield.
