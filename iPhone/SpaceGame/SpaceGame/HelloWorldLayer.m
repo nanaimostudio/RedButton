@@ -17,7 +17,8 @@
 
 // HelloWorldLayer implementation
 @implementation HelloWorldLayer
-
+int tmpX=50;
+int tmpY=49;
 +(CCScene *) scene
 {
 	// 'scene' is an autorelease object.
@@ -84,7 +85,7 @@
             [self addChild:starsEffect z:1];
         }
         
-        self.isAccelerometerEnabled = YES;
+//        self.isAccelerometerEnabled = YES;
         
         _asteroids = [[CCArray alloc] initWithCapacity:kNumAsteroids];
         for(int i = 0; i < kNumAsteroids; ++i) {
@@ -116,72 +117,82 @@
     return self;
 }
 
+- (void)shootBlue{
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    
+    CCSprite *shipLaser = [_shipLasers objectAtIndex:_nextShipLaser];
+    _nextShipLaser++;
+    if (_nextShipLaser >= _shipLasers.count) _nextShipLaser = 0;
+    
+    shipLaser.position = ccpAdd(_ship.position, ccp(shipLaser.contentSize.width/2, 0));
+    shipLaser.visible = YES;
+    [shipLaser stopAllActions];
+    [shipLaser runAction:[CCSequence actions:
+                          [CCMoveBy actionWithDuration:0.5 position:ccp(winSize.width, 0)],
+                          [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
+                          nil]];
+    [[SimpleAudioEngine sharedEngine] playEffect:@"laser_ship.caf"];
+}
+
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext{
-    [[SimpleAudioEngine sharedEngine] playEffect:@"laser_ship.caf"];
-    
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    
-    CCSprite *shipLaser = [_shipLasers objectAtIndex:_nextShipLaser];
-    _nextShipLaser++;
-    if (_nextShipLaser >= _shipLasers.count) _nextShipLaser = 0;
-    
-    shipLaser.position = ccpAdd(_ship.position, ccp(shipLaser.contentSize.width/2, 0));
-    shipLaser.visible = YES;
-    [shipLaser stopAllActions];
-    [shipLaser runAction:[CCSequence actions:
-                          [CCMoveBy actionWithDuration:0.5 position:ccp(winSize.width, 0)],
-                          [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
-                          nil]];
+    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSArray *array = [string componentsSeparatedByString:@","];
+    tmpX = [(NSString *)[array objectAtIndex:0]intValue];
+    tmpY = [(NSString *)[array objectAtIndex:1]intValue];
+    if ([[array objectAtIndex:2] isEqualToString:@"1"]) {
+        [self shootBlue];
+    }
+
 }
 
-- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    
-    [[SimpleAudioEngine sharedEngine] playEffect:@"laser_ship.caf"];
-    
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    
-    CCSprite *shipLaser = [_shipLasers objectAtIndex:_nextShipLaser];
-    _nextShipLaser++;
-    if (_nextShipLaser >= _shipLasers.count) _nextShipLaser = 0;
-    
-    shipLaser.position = ccpAdd(_ship.position, ccp(shipLaser.contentSize.width/2, 0));
-    shipLaser.visible = YES;
-    [shipLaser stopAllActions];
-    [shipLaser runAction:[CCSequence actions:
-                          [CCMoveBy actionWithDuration:0.5 position:ccp(winSize.width, 0)],
-                          [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
-                          nil]];
-    
-}
+//- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+//    
+//    [[SimpleAudioEngine sharedEngine] playEffect:@"laser_ship.caf"];
+//    
+//    CGSize winSize = [CCDirector sharedDirector].winSize;
+//    
+//    CCSprite *shipLaser = [_shipLasers objectAtIndex:_nextShipLaser];
+//    _nextShipLaser++;
+//    if (_nextShipLaser >= _shipLasers.count) _nextShipLaser = 0;
+//    
+//    shipLaser.position = ccpAdd(_ship.position, ccp(shipLaser.contentSize.width/2, 0));
+//    shipLaser.visible = YES;
+//    [shipLaser stopAllActions];
+//    [shipLaser runAction:[CCSequence actions:
+//                          [CCMoveBy actionWithDuration:0.5 position:ccp(winSize.width, 0)],
+//                          [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
+//                          nil]];
+//    
+//}
 
-- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
-    
-#define kFilteringFactor 0.1
-#define kRestAccelX -0.6
-#define kShipMaxPointsPerSec (winSize.height*0.5)        
-#define kMaxDiffX 0.2
-    
-    UIAccelerationValue rollingX, rollingY, rollingZ;
-    
-    rollingX = (acceleration.x * kFilteringFactor) + (rollingX * (1.0 - kFilteringFactor));    
-    rollingY = (acceleration.y * kFilteringFactor) + (rollingY * (1.0 - kFilteringFactor));    
-    rollingZ = (acceleration.z * kFilteringFactor) + (rollingZ * (1.0 - kFilteringFactor));
-    
-    float accelX = acceleration.x - rollingX;
-    float accelY = acceleration.y - rollingY;
-    float accelZ = acceleration.z - rollingZ;
-    
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    
-    float accelDiff = accelX - kRestAccelX;
-    float accelFraction = accelDiff / kMaxDiffX;
-    float pointsPerSec = kShipMaxPointsPerSec * accelFraction;
-    
-    _shipPointsPerSecY = pointsPerSec;
-    
-}
+//- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
+//    
+//#define kFilteringFactor 0.1
+//#define kRestAccelX -0.6
+//#define kShipMaxPointsPerSec (winSize.height*0.5)        
+//#define kMaxDiffX 0.2
+//    
+//    UIAccelerationValue rollingX, rollingY, rollingZ;
+//    
+//    rollingX = (acceleration.x * kFilteringFactor) + (rollingX * (1.0 - kFilteringFactor));    
+//    rollingY = (acceleration.y * kFilteringFactor) + (rollingY * (1.0 - kFilteringFactor));    
+//    rollingZ = (acceleration.z * kFilteringFactor) + (rollingZ * (1.0 - kFilteringFactor));
+//    
+//    float accelX = acceleration.x - rollingX;
+//    float accelY = acceleration.y - rollingY;
+//    float accelZ = acceleration.z - rollingZ;
+//    
+//    CGSize winSize = [CCDirector sharedDirector].winSize;
+//    
+//    float accelDiff = accelX - kRestAccelX;
+//    float accelFraction = accelDiff / kMaxDiffX;
+//    float pointsPerSec = kShipMaxPointsPerSec * accelFraction;
+//    
+//    _shipPointsPerSecY = pointsPerSec;
+//    
+//}
 
 - (float)randomValueBetween:(float)low andValue:(float)high {
     return (((float) arc4random() / 0xFFFFFFFFu) * (high - low)) + low;
@@ -237,6 +248,8 @@ withFilterContext:(id)filterContext{
 
 - (void)update:(ccTime)dt {
     
+    _ship.position = ccp(_ship.position.x + 3 * (tmpX-50.0)/50.0, _ship.position.y + 3 * (tmpY-49.0)/50.0);
+    
     CGPoint backgroundScrollVel = ccp(-1000, 0);
     _backgroundNode.position = ccpAdd(_backgroundNode.position, ccpMult(backgroundScrollVel, dt));
     
@@ -255,12 +268,12 @@ withFilterContext:(id)filterContext{
     }
     
     CGSize winSize = [CCDirector sharedDirector].winSize;
-    float maxY = winSize.height - _ship.contentSize.height/2;
-    float minY = _ship.contentSize.height/2;
-    
-    float newY = _ship.position.y + (_shipPointsPerSecY * dt);
-    newY = MIN(MAX(newY, minY), maxY);
-    _ship.position = ccp(_ship.position.x, newY);
+//    float maxY = winSize.height - _ship.contentSize.height/2;
+//    float minY = _ship.contentSize.height/2;
+//    
+//    float newY = _ship.position.y + (_shipPointsPerSecY * dt);
+//    newY = MIN(MAX(newY, minY), maxY);
+//    _ship.position = ccp(_ship.position.x, newY);
     
     double curTime = CACurrentMediaTime();
     if (curTime > _nextAsteroidSpawn) {
