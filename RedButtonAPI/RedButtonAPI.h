@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-@protocol RedButtonAPIDelegate
+@protocol RedButtonAPIDelegate <NSObject>
 @optional
 - (void)receivedRawDataFromArduino:(NSString *)data;
+- (void)receivedRawDataFromArduinoWithRedundantCheck:(NSString *)data;
 - (void)buttonAPressed;
 - (void)buttonBPressed;
 - (void)buttonCPressed;
