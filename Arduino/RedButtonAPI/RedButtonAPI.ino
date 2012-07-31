@@ -94,7 +94,7 @@ extern "C"
 //      char str[] = "udpsample: this is some UDP data...";
       char str[30];
       count ++;
-      sprintf(str,"id=%i,%i,%i,%i,%i,%i",count,buttonA,buttonB,buttonC,sensorValue1,sensorValue2);
+      sprintf(str,"id=%i,%i,%i,%i,%i,%i,",count,buttonA,buttonB,buttonC,sensorValue1,sensorValue2);
       memcpy(uip_appdata, str, strlen(str));
       uip_send(uip_appdata, strlen(str));
    }
